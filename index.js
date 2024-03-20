@@ -12,7 +12,7 @@
 */ 
 
 const list_sheet_name = "list";
-const line_notify_token = "LINE_NOTIFY_TOKEN";
+const discord_hook_url = "discord_hook_url";
 const search_city = "新北市";
 const search_query = "?is_format_data=1&is_new_list=1&type=1&region=3&section=26,44,43,38&searchtype=1&kind=2&other=balcony_1&showMore=1&option=washer&multiNotice=not_cover,all_sex,boy&order=posttime&orderType=desc&rentprice=1,12500";
 
@@ -79,8 +79,8 @@ function get_formated_rent_info(search_sheet, rent_result) {
     let tmp_array = ["", rent_hyperlink, rent_price, "", "", "", rent_section_name+rent_street_name+" / "+rent_location, "", rent_area, rent_floor, "", "", rent_post_id];
     format_rent_array.push(tmp_array);
 
-    let line_message = `${rent_post_id}\n${rent_title}\n${rent_url}\n$ ${rent_price}\n${rent_section_name} ${rent_street_name}\n${rent_location}\n${rent_area}坪，${rent_floor}`;
-    send_to_line_notify(line_message, rent_cover);
+    let discord_message = `${rent_post_id}\n${rent_title}\n${rent_url}\n$ ${rent_price}\n${rent_section_name} ${rent_street_name}\n${rent_location}\n${rent_area}坪，${rent_floor}`;
+    send_to_discord(discord_message)
   }
   return format_rent_array;
 }
@@ -179,27 +179,15 @@ function main() {
   range.setValues(rent_info);
 }
 
-function send_to_line_notify(message, image_url) {
-  const line_notify_url = "https://notify-api.line.me/api/notify";
-
-  const header = {
-    "Authorization": `Bearer ${line_notify_token}`,
-    'Content-Type': 'application/x-www-form-urlencoded'
-  }
-
+function send_to_discord(message) {
   const payload = {
-    "message": message,
-    "notificationDisabled": true,
-    "imageFullsize": image_url,
-    "imageThumbnail": image_url
+    content: message
   }
 
   const options = {
     "method": "post",
-    "headers": header,
-    "payload": payload,
-    "muteHttpExceptions": true
-  };
-  
-  UrlFetchApp.fetch(line_notify_url, options);
+    "payload": payload
+  }
+
+  UrlFetchApp.fetch(discord_url, options);
 }
